@@ -50,9 +50,20 @@ public class RegisterView {
     private void print() {
         StringBuilder sb = new StringBuilder();
         sb.append("REBELS: \r\n");
-        sb.append(new CentralIntelligenceController().readFromFiles(true));
+        for (RebelDomain rebel :
+                new RegisterController().readFromFiles(true)) {
+            sb.append(rebel);
+            sb.append("\r\n");
+        }
+
         sb.append("\r\nSUSPECTS: \r\n");
-        sb.append(new CentralIntelligenceController().readFromFiles(false));
+
+        for (RebelDomain suspect :
+                new RegisterController().readFromFiles(false)) {
+            sb.append(suspect);
+            sb.append("\r\n");
+        }
+
         System.out.println(sb.toString());
     }
 
@@ -83,7 +94,13 @@ public class RegisterView {
 
         } while (askNext());
 
-        new CentralIntelligenceView().show(new RegisterController().register(candidatesList));
+        List<List<RebelDomain>> filtered = new RegisterController().register(candidatesList);
+        List<RebelDomain> rebels = filtered.get(0);
+        List<RebelDomain> suspects = filtered.get(1);
+        new CentralIntelligenceView().printList(suspects, "Rejected");
+        new CentralIntelligenceController().save(suspects, false);
+
+        new CentralIntelligenceView().show(rebels);
     }
 
     private boolean askNext() {

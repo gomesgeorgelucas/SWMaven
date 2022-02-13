@@ -10,3 +10,5 @@ Java11/Maven/Lombok/ApacheCommons
 - [ ] Add interfaces
 - [x] Fix Duplicates
 - [x] Load Memory with Entries from Files
+- [x] Save files as JSON - GSON
+- [ ] correct path with spaces

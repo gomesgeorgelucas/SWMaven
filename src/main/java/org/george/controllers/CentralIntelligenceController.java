@@ -1,14 +1,17 @@
 package org.george.controllers;
 
+import com.google.gson.stream.MalformedJsonException;
+import lombok.Cleanup;
 import org.apache.commons.io.FileUtils;
 import org.george.domains.RebelDomain;
 import org.george.enums.RaceEnum;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import com.google.gson.Gson;
 
 public class CentralIntelligenceController {
 
@@ -42,13 +45,13 @@ public class CentralIntelligenceController {
     }
 
     public boolean isDuplicate(File file, RebelDomain rebel) {
-        File tempDir = FileUtils.getTempDirectory();
         try {
+            File tempDir = FileUtils.getTempDirectory();
             FileUtils.copyFileToDirectory(file, tempDir);
             File newTempFile = FileUtils.getFile(tempDir, file.getName());
             String data = FileUtils.readFileToString(newTempFile, Charset.defaultCharset());
 
-            if (data.contains(rebel.toString())) {
+            if (data.contains(new Gson().toJson(rebel))) {
                 return true;
             }
 
@@ -66,16 +69,36 @@ public class CentralIntelligenceController {
             file = new File(REBELS_FILE_PATH);
         } else {
             file = new File(SUSPECTS_FILE_PATH);
+            candidates.addAll(new RegisterController().readFromFiles(false));
         }
 
         Queue<RebelDomain> rebelsQueue = new ArrayDeque<>(candidates);
         List<RebelDomain> unique = new ArrayList<>();
 
+        for (RebelDomain uniqueRebel :
+                rebelsQueue) {
+            if (!isDuplicate(file, uniqueRebel)) {
+                unique.add(uniqueRebel);
+            }
+        }
+
+        //Erase file
+        try {
+            @Cleanup PrintWriter writer = new PrintWriter(file);
+            writer.print("");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        //Append data
         while (!rebelsQueue.isEmpty()) {
             if (!isDuplicate(file, rebelsQueue.peek())) {
                 try {
-                    unique.add(rebelsQueue.peek());
-                    FileUtils.writeStringToFile(file, Objects.requireNonNull(rebelsQueue.poll()).toString() + "\r\n", StandardCharsets.UTF_8, true);
+                    //unique.add(rebelsQueue.peek());
+                    String json = new Gson().toJson(Objects.requireNonNull(rebelsQueue.poll()));
+                    FileUtils.writeStringToFile(file, json + "\r\n", StandardCharsets.UTF_8, true);
+                } catch (MalformedJsonException mje) {
+                    mje.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -85,27 +108,6 @@ public class CentralIntelligenceController {
         }
 
         return unique;
-    }
-
-    public String readFromFiles(Boolean rebels) {
-        File file = null;
-
-        if (rebels) {
-            file = FileUtils.getFile(REBELS_FILE_PATH);
-        } else {
-            file = FileUtils.getFile(SUSPECTS_FILE_PATH);
-        }
-
-        File tempDir = FileUtils.getTempDirectory();
-
-        try {
-            FileUtils.copyFileToDirectory(file, tempDir);
-            File newTempFile = FileUtils.getFile(tempDir, file.getName());
-            String data = FileUtils.readFileToString(newTempFile, Charset.defaultCharset());
-            return data;
-        } catch (Exception e) {
-            return e.getMessage();
-        }
     }
 
     /**

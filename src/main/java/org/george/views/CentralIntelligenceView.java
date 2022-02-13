@@ -2,6 +2,7 @@ package org.george.views;
 
 import lombok.NonNull;
 import org.george.controllers.CentralIntelligenceController;
+import org.george.controllers.RegisterController;
 import org.george.domains.RebelDomain;
 import org.george.enums.RaceEnum;
 
@@ -32,8 +33,10 @@ public class CentralIntelligenceView {
         System.out.println("------REBEL ALLIANCE 2.0------");
 
 
+        List<RebelDomain> sortedList = new ArrayList<>();
 
-        List<RebelDomain> sortedList = rebels;
+        sortedList.addAll(new RegisterController().readFromFiles(true));
+        sortedList.addAll(rebels);
         printList(sortedList, "Unsorted");
 
         int option = -1;
@@ -47,28 +50,24 @@ public class CentralIntelligenceView {
 
                 switch (option) {
                     case 1 :
-                        sortedList = new CentralIntelligenceController().sortByName(rebels);
+                        sortedList = new CentralIntelligenceController().sortByName(sortedList);
                         printList(sortedList, "By Name");
                     break;
                     case 2 :
-                        sortedList = new CentralIntelligenceController().sortByAge(rebels);
+                        sortedList = new CentralIntelligenceController().sortByAge(sortedList);
                         printList(sortedList, "By Age");
                         break;
                     case 3 :
-                        sortedList = new CentralIntelligenceController().sortByRace(rebels);
+                        sortedList = new CentralIntelligenceController().sortByRace(sortedList);
                         printList(sortedList, "By Race");
                         break;
                     case 0 :
                         List<RebelDomain> unique = new CentralIntelligenceController().save(sortedList, true);
 
-                        System.out.println("New Registered Rebels: ");
                         if (unique.isEmpty()) {
-                            System.out.println("NONE!");
+                            System.out.println("No new rebel was found!");
                         } else {
-                            for (RebelDomain rebel :
-                                    unique) {
-                                System.out.println(rebel);
-                            }
+                            printList(unique, "New Registered Rebels");
                         }
 
                         exit(0);

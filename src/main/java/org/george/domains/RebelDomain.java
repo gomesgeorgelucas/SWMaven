@@ -5,12 +5,13 @@ import lombok.*;
 
 import org.george.enums.RaceEnum;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-public class RebelDomain {
+public class RebelDomain implements Serializable {
     @NotNull
     @NotEmpty
     @NotBlank
