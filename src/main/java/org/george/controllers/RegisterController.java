@@ -1,7 +1,6 @@
 package org.george.controllers;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 import org.george.domains.RebelDomain;
 import org.george.enums.RaceEnum;
 
@@ -29,18 +28,17 @@ public class RegisterController {
 
     public List<RebelDomain> register(List<RebelDomain> candidatesList) {
         List<RebelDomain> rebelsList = new ArrayList<>();
-        List<RebelDomain> rejectsList = new ArrayList<>();
+        List<RebelDomain> suspectsList = new ArrayList<>();
+
         for (RebelDomain candidate : candidatesList) {
             if (cic.verify(candidate)) {
                 rebelsList.add(candidate);
             } else {
-                rejectsList.add(candidate);
+                suspectsList.add(candidate);
             }
         }
 
-        System.out.println("TODO - Deal with rejects!!");
-
-        System.out.println("rejects: " + rejectsList);
+        new CentralIntelligenceController().save(suspectsList, false);
 
         rebelsList.add(new RebelDomain("B", 24, RaceEnum.HUMAN));
         rebelsList.add(new RebelDomain("D", 12, RaceEnum.RAKATA));

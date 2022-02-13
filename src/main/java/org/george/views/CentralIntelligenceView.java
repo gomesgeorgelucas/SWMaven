@@ -6,6 +6,8 @@ import org.george.domains.RebelDomain;
 
 import java.util.*;
 
+import static java.lang.System.exit;
+
 public class CentralIntelligenceView {
 
     private final String[] options = {"1 - Name", "2 - Age", "3 - Race", "0 - Save and Exit"};
@@ -37,12 +39,19 @@ public class CentralIntelligenceView {
                     case 2 : sortedList = new CentralIntelligenceController().sortByAge(rebels); break;
                     case 3 : sortedList = new CentralIntelligenceController().sortByRace(rebels); break;
                     case 0 :
-                        System.out.println("Registered Rebels: ");
-                        for (RebelDomain rebel:
-                             sortedList) {
-                            System.out.println(rebel);
+                        List<RebelDomain> unique = new CentralIntelligenceController().save(sortedList, true);
+
+                        System.out.println("New Registered Rebels: ");
+                        if (unique.isEmpty()) {
+                            System.out.println("NONE!");
+                        } else {
+                            for (RebelDomain rebel :
+                                    unique) {
+                                System.out.println(rebel);
+                            }
                         }
-                        new CentralIntelligenceController().saveNExit(sortedList);
+
+                        exit(0);
                         break;
                     default:
                         System.out.println("Invalid option. Try again!");
@@ -53,5 +62,7 @@ public class CentralIntelligenceView {
                 System.out.println("Invalid input. Try again!");
             }
         } while (option != 0);
+
+        System.out.println("Mindful of your thoughts, be,You, they betray.\n - Jedi");
     }
 }

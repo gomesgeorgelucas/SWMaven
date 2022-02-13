@@ -96,11 +96,7 @@ public class RegisterView {
             }
         } while (!option.equalsIgnoreCase("Y") && !option.equalsIgnoreCase("N"));
 
-        if (option.equalsIgnoreCase("Y")) {
-            return true;
-        } else {
-            return false;
-        }
+        return option.equalsIgnoreCase("Y");
     }
 
     private String askName() {
