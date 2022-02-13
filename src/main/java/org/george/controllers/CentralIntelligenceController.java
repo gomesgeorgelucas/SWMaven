@@ -31,26 +31,17 @@ public class CentralIntelligenceController {
             "Darth Tyranus", "Darth Vader", "Lady Kynthera"};
 
     public boolean verify(RebelDomain rebel) {
-        File suspects = FileUtils.getFile(SUSPECTS_FILE_PATH);
-        File rebels = FileUtils.getFile(REBELS_FILE_PATH);
-
         if (
                 Arrays.asList(knownSiths).contains(rebel.getName())
                 || (rebel.getRace().equalsIgnoreCase(RaceEnum.HUMAN.getDescription()) && rebel.getAge() >= 65)
                 || (rebel.getRace().equalsIgnoreCase(RaceEnum.HUMAN.getDescription()) && rebel.getAge() < 15)
         ) {
             return false;
-        } else if (new Random().nextBoolean()) {
-            return false;
-        }
-
-        return true;
+        } else return !new Random().nextBoolean();
 
     }
 
-    public boolean isDuplicate(File fileToCheck, RebelDomain rebel) {
-        File file = fileToCheck;
-
+    public boolean isDuplicate(File file, RebelDomain rebel) {
         File tempDir = FileUtils.getTempDirectory();
         try {
             FileUtils.copyFileToDirectory(file, tempDir);
@@ -118,39 +109,54 @@ public class CentralIntelligenceController {
     }
 
     /**
-     * MergeSort Collections
+     * MergeSort Collections.sort()
      * @param rebels
      * @return
      */
     public List<RebelDomain> sortByName(List<RebelDomain> rebels) {
         //Collections.sort(rebels, new RebelDomain.RebelNameSorter());
+        //return rebels;
         RebelDomain[] rebelsArray = new RebelDomain[rebels.size()];
         rebels.toArray(rebelsArray);
-        mergeSortByName(rebelsArray, rebelsArray.length);
+        mergeSort(rebelsArray, rebelsArray.length, "name");
         return Arrays.asList(rebelsArray);
     }
 
     /**
-     * MergeSort Collections
+     * MergeSort Collections.sort()
      * @param rebels
      * @return
      */
     public List<RebelDomain> sortByAge(List<RebelDomain> rebels) {
-        Collections.sort(rebels, new RebelDomain.RebelAgeSorter());
-        return rebels;
+        //Collections.sort(rebels, new RebelDomain.RebelAgeSorter());
+        //return rebels;
+        RebelDomain[] rebelsArray = new RebelDomain[rebels.size()];
+        rebels.toArray(rebelsArray);
+        mergeSort(rebelsArray, rebelsArray.length, "age");
+        return Arrays.asList(rebelsArray);
     }
 
     /**
-     * MergeSort Collections
+     * MergeSort Collections.sort()
      * @param rebels
      * @return
      */
     public List<RebelDomain> sortByRace(List<RebelDomain> rebels) {
-        Collections.sort(rebels, new RebelDomain.RebelRaceSorter());
-        return rebels;
+        //Collections.sort(rebels, new RebelDomain.RebelRaceSorter());
+        //return rebels;
+        RebelDomain[] rebelsArray = new RebelDomain[rebels.size()];
+        rebels.toArray(rebelsArray);
+        mergeSort(rebelsArray, rebelsArray.length, "race");
+        return Arrays.asList(rebelsArray);
     }
 
-    private void mergeSortByName(RebelDomain[] rebels, int size) {
+    /**
+     * MergeSort Algorth (Recursive) - enables sort by field wihtout using comparator.
+     * @param rebels
+     * @param size
+     * @param field - String literal for name, age or race.
+     */
+    private void mergeSort(RebelDomain[] rebels, int size, String field) {
         if (size < 2) {
             return;
         }
@@ -161,24 +167,48 @@ public class CentralIntelligenceController {
         RebelDomain[] rightArray = new RebelDomain[size - midPoint];
 
         System.arraycopy(rebels, 0, leftArray, 0, midPoint);
-
         if (size - midPoint >= 0) System.arraycopy(rebels, midPoint, rightArray, 0, size - midPoint);
 
-        mergeSortByName(leftArray, midPoint);
-        mergeSortByName(rightArray, size - midPoint);
+        mergeSort(leftArray, midPoint, field);
+        mergeSort(rightArray, size - midPoint, field);
 
-        mergeByName(rebels, leftArray, rightArray, midPoint, size - midPoint);
+        merge(rebels, leftArray, rightArray, midPoint, size - midPoint, field);
     }
 
-    private void mergeByName(RebelDomain[] rebels, RebelDomain[] leftArray, RebelDomain[] rightArray, int left, int right) {
+    /**
+     * Actual merging of smaller left and right arrays.
+     * @param rebels
+     * @param leftArray
+     * @param rightArray
+     * @param left
+     * @param right
+     * @param field
+     */
+    private void merge(RebelDomain[] rebels, RebelDomain[] leftArray, RebelDomain[] rightArray, int left, int right, String field) {
 
         int i = 0, j = 0, k = 0;
         while (i < left && j < right) {
-            if (leftArray[i].getName().compareTo(rightArray[j].getName()) <= 0) {
-                rebels[k++] = leftArray[i++];
-            }
-            else {
-                rebels[k++] = rightArray[j++];
+            if (field.equalsIgnoreCase("name")) {
+                if (leftArray[i].getName().compareTo(rightArray[j].getName()) <= 0) {
+                    rebels[k++] = leftArray[i++];
+                }
+                else {
+                    rebels[k++] = rightArray[j++];
+                }
+            } else if (field.equalsIgnoreCase("age")) {
+                if (leftArray[i].getAge() <= rightArray[j].getAge()) {
+                    rebels[k++] = leftArray[i++];
+                }
+                else {
+                    rebels[k++] = rightArray[j++];
+                }
+            } else if (field.equalsIgnoreCase("race")) {
+                if (leftArray[i].getRace().compareTo(rightArray[j].getRace()) <= 0) {
+                    rebels[k++] = leftArray[i++];
+                }
+                else {
+                    rebels[k++] = rightArray[j++];
+                }
             }
         }
         while (i < left) {
