@@ -1,6 +1,7 @@
 package org.george.views;
 
 import lombok.NonNull;
+import org.george.controllers.CentralIntelligenceController;
 import org.george.controllers.RegisterController;
 import org.george.domains.RebelDomain;
 import org.george.enums.RaceEnum;
@@ -22,12 +23,10 @@ public class RegisterView {
     }
 
     public void show() {
-        System.out.println("------REBEL ALLIANCE 2.0------");
-
         int option = -1;
 
         while (option != 0) {
-
+            System.out.println("------REBEL ALLIANCE 2.0------");
             printMenu(options);
 
             try {
@@ -49,6 +48,12 @@ public class RegisterView {
     }
 
     private void print() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("REBELS: \r\n");
+        sb.append(new CentralIntelligenceController().readFromFiles(true));
+        sb.append("\r\nSUSPECTS: \r\n");
+        sb.append(new CentralIntelligenceController().readFromFiles(false));
+        System.out.println(sb.toString());
     }
 
     @Deprecated
@@ -74,7 +79,7 @@ public class RegisterView {
             int age = askAge();
             RaceEnum raceEnum = askRace();
 
-            candidatesList.add(new RebelDomain(name,age,raceEnum));
+            candidatesList.add(new RebelDomain(name,age,raceEnum.getDescription()));
 
         } while (askNext());
 

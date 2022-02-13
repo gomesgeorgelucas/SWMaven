@@ -10,8 +10,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static java.lang.System.exit;
-
 public class CentralIntelligenceController {
 
     public static final String REBELS_FILE_PATH = Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
@@ -38,8 +36,8 @@ public class CentralIntelligenceController {
 
         if (
                 Arrays.asList(knownSiths).contains(rebel.getName())
-                || (rebel.getRace() == RaceEnum.HUMAN && rebel.getAge() >= 65)
-                || (rebel.getRace() == RaceEnum.HUMAN && rebel.getAge() < 15)
+                || (rebel.getRace().equalsIgnoreCase(RaceEnum.HUMAN.getDescription()) && rebel.getAge() >= 65)
+                || (rebel.getRace().equalsIgnoreCase(RaceEnum.HUMAN.getDescription()) && rebel.getAge() < 15)
         ) {
             return false;
         } else if (new Random().nextBoolean()) {
@@ -98,15 +96,34 @@ public class CentralIntelligenceController {
         return unique;
     }
 
+    public String readFromFiles(Boolean rebels) {
+        File file = null;
+
+        if (rebels) {
+            file = FileUtils.getFile(REBELS_FILE_PATH);
+        } else {
+            file = FileUtils.getFile(SUSPECTS_FILE_PATH);
+        }
+
+        File tempDir = FileUtils.getTempDirectory();
+
+        try {
+            FileUtils.copyFileToDirectory(file, tempDir);
+            File newTempFile = FileUtils.getFile(tempDir, file.getName());
+            String data = FileUtils.readFileToString(newTempFile, Charset.defaultCharset());
+            return data;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
     /**
      * MergeSort Collections
      * @param rebels
      * @return
      */
     public List<RebelDomain> sortByName(List<RebelDomain> rebels) {
-        System.out.println(rebels);
         Collections.sort(rebels, new RebelDomain.RebelNameSorter());
-        System.out.println(rebels);
         return rebels;
     }
 
@@ -116,9 +133,7 @@ public class CentralIntelligenceController {
      * @return
      */
     public List<RebelDomain> sortByAge(List<RebelDomain> rebels) {
-        System.out.println(rebels);
         Collections.sort(rebels, new RebelDomain.RebelAgeSorter());
-        System.out.println(rebels);
         return rebels;
     }
 
@@ -128,9 +143,7 @@ public class CentralIntelligenceController {
      * @return
      */
     public List<RebelDomain> sortByRace(List<RebelDomain> rebels) {
-        System.out.println(rebels);
         Collections.sort(rebels, new RebelDomain.RebelRaceSorter());
-        System.out.println(rebels);
         return rebels;
     }
 }

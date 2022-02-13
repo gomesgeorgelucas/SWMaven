@@ -1,23 +1,27 @@
 package org.george.domains;
 
 import jakarta.validation.constraints.*;
-import lombok.Value;
+import lombok.*;
 
 import org.george.enums.RaceEnum;
 
 import java.util.Comparator;
 
-@Value
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
 public class RebelDomain {
     @NotNull
     @NotEmpty
     @NotBlank
-    String name;
+    private final String name;
     @Min(value = 15)
     @Positive
-    int age;
+    private final int age;
     @NotNull
-    RaceEnum race;
+    @NotEmpty
+    @NotBlank
+    private final String race;
 
     public static class RebelNameSorter implements Comparator<RebelDomain> {
 
@@ -39,7 +43,15 @@ public class RebelDomain {
 
         @Override
         public int compare(RebelDomain o1, RebelDomain o2) {
-            return Integer.compare(o1.getRace().ordinal(), o2.getRace().ordinal());
+            return o1.getRace().compareTo(o2.getRace());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "[Name=" + name +
+                ", Age=" + age +
+                ", Race=" + race +
+                "]";
     }
 }

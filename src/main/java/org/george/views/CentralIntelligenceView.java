@@ -3,6 +3,7 @@ package org.george.views;
 import lombok.NonNull;
 import org.george.controllers.CentralIntelligenceController;
 import org.george.domains.RebelDomain;
+import org.george.enums.RaceEnum;
 
 import java.util.*;
 
@@ -16,28 +17,47 @@ public class CentralIntelligenceView {
         for (String option : options) {
             System.out.println(option);
         }
-        System.out.print("Choose your option: ");
+        System.out.println("Choose your option: ");
+    }
+
+    public void printList(List<RebelDomain> rebels, String order) {
+        System.out.println(order + ": ");
+
+        for (RebelDomain rebel: rebels) {
+            System.out.println(rebel);
+        }
     }
 
     public void show(List<RebelDomain> rebels) {
         System.out.println("------REBEL ALLIANCE 2.0------");
-        System.out.println("-------------SORT-------------");
+
+
 
         List<RebelDomain> sortedList = rebels;
+        printList(sortedList, "Unsorted");
 
         int option = -1;
 
         do {
-
+            System.out.println("-------------SORT-------------");
             printMenu(options);
 
             try {
                 option = new Scanner(System.in).nextInt();
 
                 switch (option) {
-                    case 1 : sortedList = new CentralIntelligenceController().sortByName(rebels); break;
-                    case 2 : sortedList = new CentralIntelligenceController().sortByAge(rebels); break;
-                    case 3 : sortedList = new CentralIntelligenceController().sortByRace(rebels); break;
+                    case 1 :
+                        sortedList = new CentralIntelligenceController().sortByName(rebels);
+                        printList(sortedList, "By Name");
+                    break;
+                    case 2 :
+                        sortedList = new CentralIntelligenceController().sortByAge(rebels);
+                        printList(sortedList, "By Age");
+                        break;
+                    case 3 :
+                        sortedList = new CentralIntelligenceController().sortByRace(rebels);
+                        printList(sortedList, "By Race");
+                        break;
                     case 0 :
                         List<RebelDomain> unique = new CentralIntelligenceController().save(sortedList, true);
 

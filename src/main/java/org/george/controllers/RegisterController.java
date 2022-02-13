@@ -40,12 +40,12 @@ public class RegisterController {
 
         new CentralIntelligenceController().save(suspectsList, false);
 
-        rebelsList.add(new RebelDomain("B", 24, RaceEnum.HUMAN));
-        rebelsList.add(new RebelDomain("D", 12, RaceEnum.RAKATA));
-        rebelsList.add(new RebelDomain("C", 67, RaceEnum.GREE));
-        rebelsList.add(new RebelDomain("G", 28, RaceEnum.HUMAN));
-        rebelsList.add(new RebelDomain("E", 62, RaceEnum.RAKATA));
-        rebelsList.add(new RebelDomain("I", 15, RaceEnum.GREE));
+        rebelsList.add(new RebelDomain("B", 24, RaceEnum.HUMAN.getDescription()));
+        rebelsList.add(new RebelDomain("D", 12, RaceEnum.RAKATA.getDescription()));
+        rebelsList.add(new RebelDomain("C", 67, RaceEnum.GREE.getDescription()));
+        rebelsList.add(new RebelDomain("G", 28, RaceEnum.HUMAN.getDescription()));
+        rebelsList.add(new RebelDomain("E", 62, RaceEnum.RAKATA.getDescription()));
+        rebelsList.add(new RebelDomain("I", 15, RaceEnum.GREE.getDescription()));
 
         return rebelsList;
     }
