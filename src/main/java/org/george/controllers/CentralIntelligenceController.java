@@ -123,8 +123,11 @@ public class CentralIntelligenceController {
      * @return
      */
     public List<RebelDomain> sortByName(List<RebelDomain> rebels) {
-        Collections.sort(rebels, new RebelDomain.RebelNameSorter());
-        return rebels;
+        //Collections.sort(rebels, new RebelDomain.RebelNameSorter());
+        RebelDomain[] rebelsArray = new RebelDomain[rebels.size()];
+        rebels.toArray(rebelsArray);
+        mergeSortByName(rebelsArray, rebelsArray.length);
+        return Arrays.asList(rebelsArray);
     }
 
     /**
@@ -145,5 +148,44 @@ public class CentralIntelligenceController {
     public List<RebelDomain> sortByRace(List<RebelDomain> rebels) {
         Collections.sort(rebels, new RebelDomain.RebelRaceSorter());
         return rebels;
+    }
+
+    private void mergeSortByName(RebelDomain[] rebels, int size) {
+        if (size < 2) {
+            return;
+        }
+
+        int midPoint = size / 2;
+
+        RebelDomain[] leftArray = new RebelDomain[midPoint];
+        RebelDomain[] rightArray = new RebelDomain[size - midPoint];
+
+        System.arraycopy(rebels, 0, leftArray, 0, midPoint);
+
+        if (size - midPoint >= 0) System.arraycopy(rebels, midPoint, rightArray, 0, size - midPoint);
+
+        mergeSortByName(leftArray, midPoint);
+        mergeSortByName(rightArray, size - midPoint);
+
+        mergeByName(rebels, leftArray, rightArray, midPoint, size - midPoint);
+    }
+
+    private void mergeByName(RebelDomain[] rebels, RebelDomain[] leftArray, RebelDomain[] rightArray, int left, int right) {
+
+        int i = 0, j = 0, k = 0;
+        while (i < left && j < right) {
+            if (leftArray[i].getName().compareTo(rightArray[j].getName()) <= 0) {
+                rebels[k++] = leftArray[i++];
+            }
+            else {
+                rebels[k++] = rightArray[j++];
+            }
+        }
+        while (i < left) {
+            rebels[k++] = leftArray[i++];
+        }
+        while (j < right) {
+            rebels[k++] = rightArray[j++];
+        }
     }
 }
