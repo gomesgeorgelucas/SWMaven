@@ -3,17 +3,20 @@ package org.george.controllers;
 import com.google.gson.stream.MalformedJsonException;
 import lombok.Cleanup;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.george.domains.RebelDomain;
 import org.george.enums.RaceEnum;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import com.google.gson.Gson;
 
 public class CentralIntelligenceController {
+
+    public static final Logger LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER = LogManager.getLogger(CentralIntelligenceController.class);
 
     public static final String REBELS_FILE_PATH = Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
             getResource("./rebels.txt")).getPath();
@@ -52,6 +55,7 @@ public class CentralIntelligenceController {
             String data = FileUtils.readFileToString(newTempFile, Charset.defaultCharset());
 
             if (data.contains(new Gson().toJson(rebel))) {
+                LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.warn("Duplicate found: " + rebel.toString());
                 return true;
             }
 
@@ -66,8 +70,10 @@ public class CentralIntelligenceController {
         File file = null;
 
         if (accepted) {
+            LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.warn("Trying to access file: " + REBELS_FILE_PATH);
             file = new File(REBELS_FILE_PATH);
         } else {
+            LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.warn("Trying to access file: " + SUSPECTS_FILE_PATH);
             file = new File(SUSPECTS_FILE_PATH);
             candidates.addAll(new RegisterController().readFromFiles(false));
         }
@@ -85,6 +91,7 @@ public class CentralIntelligenceController {
         //Erase file
         try {
             @Cleanup PrintWriter writer = new PrintWriter(file);
+            LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.warn("Erasing file. Prepping for new entries...");
             writer.print("");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -101,6 +108,8 @@ public class CentralIntelligenceController {
                     mje.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.warn("Tried to write new entry to file...");
                 }
             } else {
                 rebelsQueue.poll();

@@ -3,8 +3,9 @@ package org.george.controllers;
 import com.google.gson.Gson;
 import lombok.Cleanup;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.george.domains.RebelDomain;
-import org.george.enums.RaceEnum;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,6 +13,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class RegisterController {
+
+    public static final Logger LOGGER_REGISTER_CONTROLLER = LogManager.getLogger(RegisterController.class);
+
     CentralIntelligenceController cic = new CentralIntelligenceController();
 
     public static final String REBELS_FILE_PATH = Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
@@ -43,7 +47,6 @@ public class RegisterController {
             }
         }
 
-
         //rebelsList.add(new RebelDomain("B", 24, RaceEnum.HUMAN.getDescription()));
         //rebelsList.add(new RebelDomain("D", 12, RaceEnum.RAKATA.getDescription()));
         //rebelsList.add(new RebelDomain("C", 67, RaceEnum.GREE.getDescription()));
@@ -54,7 +57,9 @@ public class RegisterController {
         //new CentralIntelligenceController().save(suspectsList, false);
 
         List<List<RebelDomain>> groups =  new ArrayList<>();
+        LOGGER_REGISTER_CONTROLLER.warn("Rebels allowed: " + rebelsList);
         groups.add(rebelsList);
+        LOGGER_REGISTER_CONTROLLER.warn("Suspects detected" + suspectsList);
         groups.add(suspectsList);
 
         return groups;
@@ -66,8 +71,10 @@ public class RegisterController {
         List<RebelDomain> listToPrint = new ArrayList<>();
 
         if (rebels) {
+            LOGGER_REGISTER_CONTROLLER.warn("Trying to handle file: " + REBELS_FILE_PATH);
             file = FileUtils.getFile(REBELS_FILE_PATH);
         } else {
+            LOGGER_REGISTER_CONTROLLER.warn("Trying to handle file: " + SUSPECTS_FILE_PATH);
             file = FileUtils.getFile(SUSPECTS_FILE_PATH);
         }
 

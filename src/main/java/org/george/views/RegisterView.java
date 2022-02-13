@@ -1,6 +1,13 @@
 package org.george.views;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.NonNull;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.george.SWApp;
 import org.george.controllers.CentralIntelligenceController;
 import org.george.controllers.RegisterController;
 import org.george.domains.RebelDomain;
@@ -13,6 +20,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class RegisterView {
+
+    public static final Logger LOGGER_REGISTER_VIEW = LogManager.getLogger(RegisterView.class);
+
     private final String[] options = {"1 - Register", "2 - Print", "0 - Exit"};
 
     private void printMenu(@NonNull String[] options) {
@@ -35,7 +45,10 @@ public class RegisterView {
                 switch (option) {
                     case 1 : register(); break;
                     case 2 : print(); break;
-                    case 0 : exit(0); break;
+                    case 0 :
+                        LOGGER_REGISTER_VIEW.info("Routine finished. Exit: 0");
+                        exit(0);
+                        break;
                     default:
                         System.out.println("Invalid option. Try again!");
                         break;
@@ -83,14 +96,20 @@ public class RegisterView {
         System.out.println("------REBEL ALLIANCE------");
         System.out.println("---------REGISTER---------");
 
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
         List<RebelDomain> candidatesList = new ArrayList<>();
 
         do {
             String name = askName();
             int age = askAge();
             RaceEnum raceEnum = askRace();
+            RebelDomain tempCandidate = new RebelDomain(name,age,raceEnum.getDescription());
+            Set<ConstraintViolation<RebelDomain>> constraintViolations = validator.validate(tempCandidate);
+            constraintViolations.forEach(x -> LOGGER_REGISTER_VIEW.error(x.getMessage() + " Field: " + x.getPropertyPath()));
 
-            candidatesList.add(new RebelDomain(name,age,raceEnum.getDescription()));
+            candidatesList.add(tempCandidate);
 
         } while (askNext());
 
