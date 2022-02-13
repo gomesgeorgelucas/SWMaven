@@ -2,13 +2,22 @@ package org.george.controllers;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.george.domains.RebelDomain;
 import org.george.enums.RaceEnum;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class CentralIntelligenceController {
+
+    private static final String REBELS_FILE_PATH = CentralIntelligenceController.class.getClassLoader().
+            getResource("./rebels.txt").getPath();
+    private static final String SUSPECTS_FILE_PATH = CentralIntelligenceController.class.getClassLoader().
+            getResource("./suspects.txt").getPath();
+
     private final String[] knownSiths = {"Ajunta Pall", "Belia Darzu", "The Dark Underlord",
             "Darth Andeddu", "Darth Andru", "Darth Bandon",
             "Darth Glovoc", "Darth Malak", "Darth Nihilus",
@@ -53,4 +62,36 @@ public class CentralIntelligenceController {
 
     }
 
+    public List<RebelDomain> sortByName(List<RebelDomain> rebels) {
+        System.out.println(rebels);
+        Collections.sort(rebels, new RebelDomain.RebelNameSorter());
+        System.out.println(rebels);
+        return rebels;
+    }
+
+    public List<RebelDomain> sortByAge(List<RebelDomain> rebels) {
+        System.out.println(rebels);
+        Collections.sort(rebels, new RebelDomain.RebelAgeSorter());
+        System.out.println(rebels);
+        return rebels;
+    }
+
+    public List<RebelDomain> sortByRace(List<RebelDomain> rebels) {
+        System.out.println(rebels);
+        Collections.sort(rebels, new RebelDomain.RebelRaceSorter());
+        System.out.println(rebels);
+        return rebels;
+    }
+
+    public void saveNExit(List<RebelDomain> rebels) {
+        File file = new File(REBELS_FILE_PATH);
+        Queue<RebelDomain> rebelsQueue = new ArrayDeque<>(rebels);
+        while (!rebelsQueue.isEmpty()) {
+            try {
+                FileUtils.writeStringToFile(file, rebelsQueue.poll().toString() + "\r\n",StandardCharsets.UTF_8, true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
