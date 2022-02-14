@@ -1,6 +1,5 @@
 package org.george.controllers;
 
-import com.google.gson.stream.MalformedJsonException;
 import lombok.Cleanup;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -9,6 +8,7 @@ import org.george.domains.RebelDomain;
 import org.george.enums.RaceEnum;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -18,10 +18,44 @@ public class CentralIntelligenceController {
 
     public static final Logger LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER = LogManager.getLogger(CentralIntelligenceController.class);
 
-    public static final String REBELS_FILE_PATH = Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
-            getResource("./rebels.txt")).getPath();
-    public static final String SUSPECTS_FILE_PATH = Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
-            getResource("./suspects.txt")).getPath();
+    public static String REBELS_FILE_PATH;
+
+    static {
+        try {
+            REBELS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
+                    getResource("./rebels.txt")).getPath(), Charset.defaultCharset()));
+        } catch (NullPointerException e) {
+            LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.error("File not found...");
+            //e.printStackTrace();
+            try {
+                FileUtils.touch(new File(URLDecoder.decode(Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().getResource("")).getPath() + "rebels.txt", Charset.defaultCharset())));
+                REBELS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
+                        getResource("./rebels.txt")).getPath(), Charset.defaultCharset()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public static String SUSPECTS_FILE_PATH;
+
+    static {
+        try {
+            SUSPECTS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
+                    getResource("./suspects.txt")).getPath(), Charset.defaultCharset()));
+        } catch (NullPointerException e) {
+            LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.error("File not found...");
+            //e.printStackTrace();
+            try {
+                FileUtils.touch(new File(URLDecoder.decode(Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().getResource("")).getPath() + "suspects.txt", Charset.defaultCharset())));
+                SUSPECTS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
+                        getResource("./suspects.txt")).getPath(), Charset.defaultCharset()));
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 
     private final String[] knownSiths = {"Ajunta Pall", "Belia Darzu", "The Dark Underlord",
             "Darth Andeddu", "Darth Andru", "Darth Bandon",
@@ -67,7 +101,7 @@ public class CentralIntelligenceController {
 
     public List<RebelDomain> save(List<RebelDomain> candidates, boolean accepted) {
 
-        File file = null;
+        File file;
 
         if (accepted) {
             LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.warn("Trying to access file: " + REBELS_FILE_PATH);
@@ -104,10 +138,8 @@ public class CentralIntelligenceController {
                     //unique.add(rebelsQueue.peek());
                     String json = new Gson().toJson(Objects.requireNonNull(rebelsQueue.poll()));
                     FileUtils.writeStringToFile(file, json + "\r\n", StandardCharsets.UTF_8, true);
-                } catch (MalformedJsonException mje) {
+                } catch (IOException mje) {
                     mje.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 } finally {
                     LOGGER_CENTRAL_INTELLIGENCE_CONTROLLER.warn("Tried to write new entry to file...");
                 }
@@ -119,11 +151,6 @@ public class CentralIntelligenceController {
         return unique;
     }
 
-    /**
-     * MergeSort Collections.sort()
-     * @param rebels
-     * @return
-     */
     public List<RebelDomain> sortByName(List<RebelDomain> rebels) {
         //Collections.sort(rebels, new RebelDomain.RebelNameSorter());
         //return rebels;
@@ -133,11 +160,6 @@ public class CentralIntelligenceController {
         return Arrays.asList(rebelsArray);
     }
 
-    /**
-     * MergeSort Collections.sort()
-     * @param rebels
-     * @return
-     */
     public List<RebelDomain> sortByAge(List<RebelDomain> rebels) {
         //Collections.sort(rebels, new RebelDomain.RebelAgeSorter());
         //return rebels;
@@ -147,11 +169,6 @@ public class CentralIntelligenceController {
         return Arrays.asList(rebelsArray);
     }
 
-    /**
-     * MergeSort Collections.sort()
-     * @param rebels
-     * @return
-     */
     public List<RebelDomain> sortByRace(List<RebelDomain> rebels) {
         //Collections.sort(rebels, new RebelDomain.RebelRaceSorter());
         //return rebels;
@@ -161,12 +178,6 @@ public class CentralIntelligenceController {
         return Arrays.asList(rebelsArray);
     }
 
-    /**
-     * MergeSort Algorth (Recursive) - enables sort by field wihtout using comparator.
-     * @param rebels
-     * @param size
-     * @param field - String literal for name, age or race.
-     */
     private void mergeSort(RebelDomain[] rebels, int size, String field) {
         if (size < 2) {
             return;
@@ -186,15 +197,6 @@ public class CentralIntelligenceController {
         merge(rebels, leftArray, rightArray, midPoint, size - midPoint, field);
     }
 
-    /**
-     * Actual merging of smaller left and right arrays.
-     * @param rebels
-     * @param leftArray
-     * @param rightArray
-     * @param left
-     * @param right
-     * @param field
-     */
     private void merge(RebelDomain[] rebels, RebelDomain[] leftArray, RebelDomain[] rightArray, int left, int right, String field) {
 
         int i = 0, j = 0, k = 0;

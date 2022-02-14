@@ -1,6 +1,7 @@
 package org.george.controllers;
 
 import com.google.gson.Gson;
+import lombok.Builder;
 import lombok.Cleanup;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -8,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 import org.george.domains.RebelDomain;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -18,10 +21,43 @@ public class RegisterController {
 
     CentralIntelligenceController cic = new CentralIntelligenceController();
 
-    public static final String REBELS_FILE_PATH = Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
-            getResource("./rebels.txt")).getPath();
-    public static final String SUSPECTS_FILE_PATH = Objects.requireNonNull(CentralIntelligenceController.class.getClassLoader().
-            getResource("./suspects.txt")).getPath();
+    public static String REBELS_FILE_PATH;
+
+    static {
+        try {
+            REBELS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(Objects.requireNonNull(RegisterController.class.getClassLoader().
+                    getResource("./rebels.txt")).getPath(), Charset.defaultCharset()));
+        } catch (NullPointerException e) {
+            LOGGER_REGISTER_CONTROLLER.error("File not found...");
+            //e.printStackTrace();
+            try {
+                FileUtils.touch(new File(URLDecoder.decode(RegisterController.class.getClassLoader().getResource("").getPath() + "rebels.txt", Charset.defaultCharset())));
+                REBELS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(Objects.requireNonNull(RegisterController.class.getClassLoader().
+                        getResource("./rebels.txt")).getPath(), Charset.defaultCharset()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public static String SUSPECTS_FILE_PATH;
+
+    static {
+        try {
+            SUSPECTS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(RegisterController.class.getClassLoader().
+                    getResource("./suspects.txt").getPath(), Charset.defaultCharset()));
+        } catch (NullPointerException e) {
+            LOGGER_REGISTER_CONTROLLER.error("File not found...");
+            //e.printStackTrace();
+            try {
+                FileUtils.touch(new File(URLDecoder.decode(RegisterController.class.getClassLoader().getResource("").getPath() + "suspects.txt", Charset.defaultCharset())));
+                SUSPECTS_FILE_PATH = Objects.requireNonNull(URLDecoder.decode(RegisterController.class.getClassLoader().
+                        getResource("./suspects.txt").getPath(), Charset.defaultCharset()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 
     @Deprecated
     public void register(RebelDomain rebel) throws IOException {

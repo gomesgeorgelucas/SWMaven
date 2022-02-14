@@ -3,8 +3,6 @@ package org.george.domains;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import org.george.enums.RaceEnum;
-
 import java.io.Serializable;
 import java.util.Comparator;
 
